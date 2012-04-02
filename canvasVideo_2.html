@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<head>
+	<style type="text/css">
+		canvas {
+			width:90%;
+			height:90%;
+			margin:0 auto;
+			text-align:center;
+			border:2px solid rgb(100, 100, 100);
+			box-shadow:0 0 1.5em rgba(0, 0, 0, .3);
+		}
+		#popcorn_note {
+			height:300px;
+			width:300px;
+			position:relative;
+		}
+		input[type="button"] {
+			border:none;
+			background-color:rgba(0, 100, 20, .4);
+			border-radius:1.4em;
+			font-size:1em;
+			color:rgba(255, 255, 255, .75);
+			box-shadow:0 .1em .1em rgba(0, 0, 0, .3);
+			text-transform:uppercase;
+			padding:.3em .6em;
+			width:100%;
+			background-image: -moz-linear-gradient(top, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+				background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,0.2)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+				background-image: -webkit-linear-gradient(top, rgba(255,255,255,0.2) 0%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+				background-image: -o-linear-gradient(top, rgba(255,255,255,0.2) 0%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+				background-image: -ms-linear-gradient(top, rgba(255,255,255,0.2) 0%,rgba(255,255,255,0) 100%); /* IE10+ */
+				background-image: linear-gradient(top, rgba(255,255,255,0.2) 0%,rgba(255,255,255,0) 100%); /* W3C */		
+		}
+		#position,
+		#duration,
+		video {
+			display:none;
+		}
+	</style>
+	<script src="http://popcornjs.org/code/dist/popcorn-complete.min.js"></script>
+	<script>
+	      // ensure the web page (DOM) has loaded
+	      document.addEventListener("DOMContentLoaded", function () {
+
+	         // Create a popcorn instance by calling Popcorn("#id-of-my-video")
+	         var pop = Popcorn("#yeahBud");
+
+	         // add a footnote at 2 seconds, and remove it at 6 seconds
+	         pop.footnote({
+	           start: 6,
+	           end: 200,
+	           text: "Yeah Bud!",
+	           target: "popcorn_note"
+	         });
+	
+					var p = Popcorn( "#yeahBud" );
+
+					p.openmap( {
+					        start: 0,
+					        end: 5,
+					        type: "SATELLITE",
+					        target: "map",
+					        lat: 43.665429,
+					        lng: -79.403323,
+					        zoom: "10"
+					      });
+					
+					var pImg = Popcorn( "#yeahBud");
+					
+								pImg.flickr({
+								       start: 5,
+								       end: 15,
+								       userid: "16833954@N00",
+											imageid: "59115620",
+								       target: "flickrdiv"
+								     });
+					
+
+	      }, false);
+	    </script>
+</head>
+<body>
+	<!-- <canvas id="draw"></canvas> -->
+	<canvas height="600px" width="900px"></canvas>
+  <video height="600px" width="900px" id="yeahBud">
+		<source src="72476999.mp4" type=video/mp4 >
+  </video>
+  <p>
+    <input type="button" id="play" value="play">
+    <span id="position">00:01</span>  <span id="duration">00:25</span>
+  </p>
+
+<div id="popcorn_note"></div>
+<div id="map"></div>
+<div id="flickrdiv"></div>
+
+<script src="h5utils.js"></script>
+<script>
+var video = document.querySelector('video');
+var togglePlay = document.querySelector('#play');
+var position = document.querySelector('#position');
+var canvas = document.querySelector('canvas');
+var ctx = canvas.getContext('2d');
+
+addEvent(togglePlay, 'click', function () {
+  video.playbackRate = 1;
+  if (video.paused) {
+    if (video.ended) video.currentTime = 0;
+    video.play();
+    this.value = "pause";
+  } else {
+    video.pause();
+    this.value = "play";
+  }
+});
+
+setInterval(function () {
+  position.innerHTML = asTime(video.currentTime);
+
+  // ctx.restore();
+  ctx.drawImage(video, 0, 0, video.width, video.height, 0, 0, canvas.width, canvas.height);
+}, 1000 / 15);
+
+addEvent(video, 'ended', function () {
+  togglePlay.value = "play";
+});
+
+addEvent(video, 'canplay', function () {
+  video.muted = false;
+  document.querySelector('#duration').innerHTML = asTime(this.duration);
+  startCanvas();
+});
+
+
+function startCanvas() {
+  canvas.setAttribute('height', Math.floor(video.height));
+  canvas.setAttribute('width', Math.floor(video.width));
+  
+  //ctx.translate(canvas.width/2, canvas.height/2);
+  //ctx.scale(-1, 1);
+  //ctx.translate(-canvas.width/2, -canvas.height/2);
+  //ctx.drawImage(video, 0, 0, video.width, video.height, 0, 0, canvas.width, canvas.height);
+  // var mirror = canvas.height * 0.6;
+  // var grad = ctx.createLinearGradient(0, 0, 0, mirror);
+  // grad.addColorStop(0, 'rgba(0, 0, 0, 0.5)');
+  // grad.addColorStop(1, 'rgba(0, 0, 0, 1)');
+  // ctx.fillStyle = grad;
+  // ctx.rect(0, 0, canvas.width, mirror);
+  // ctx.fill();
+  // ctx.save();  
+}
+
+function asTime(t) {
+  t = Math.round(t);
+  var s = t % 60;
+  var m = Math.round(t / 60);
+  
+  return two(m) + ':' + two(s);
+}
+
+function two(s) {
+  s += "";
+  if (s.length < 2) s = "0" + s;
+  return s;
+}
+</script>
+
+</body>
+</html>
